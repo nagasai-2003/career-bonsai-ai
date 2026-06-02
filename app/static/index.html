@@ -490,20 +490,25 @@
 
             <div class="glass-panel rounded-xl soft-shadow p-md border border-surface-container/60 space-y-md">
                 <div>
-                    <h3 class="font-bold text-headline-md text-on-surface">API Credentials</h3>
-                    <p class="text-label-md text-on-surface-variant">Enter a customized API Key to overwrite environment settings.</p>
+                    <h3 class="font-bold text-headline-md text-on-surface">System Configurations</h3>
+                    <p class="text-label-md text-on-surface-variant">Customize your LLM API credentials and FastAPI server parameters.</p>
                 </div>
                 <div class="space-y-sm">
                     <div>
                         <label class="block text-label-md text-on-surface mb-xs font-semibold" for="local_groq_key">Custom Groq API Key</label>
                         <input type="password" id="local_groq_key" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="gsk_...">
                     </div>
+                    <div>
+                        <label class="block text-label-md text-on-surface mb-xs font-semibold" for="local_backend_url">FastAPI Backend Endpoint</label>
+                        <input type="text" id="local_backend_url" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="e.g. http://127.0.0.1:8000">
+                        <p class="text-[10px] text-outline mt-xs font-semibold">Leave empty to auto-detect (Local dev or Render cloud).</p>
+                    </div>
                     <div class="flex gap-sm">
                         <button onclick="saveSettings()" class="bg-primary hover:bg-secondary text-white font-bold py-2 px-md rounded-lg transition-colors">
-                            Save Key
+                            Save Configurations
                         </button>
                         <button onclick="clearSettings()" class="border border-outline text-on-surface hover:bg-surface-container-low font-bold py-2 px-md rounded-lg transition-colors">
-                            Use System Key
+                            Use Defaults
                         </button>
                     </div>
                 </div>
@@ -521,10 +526,14 @@
 
         // On document load
         document.addEventListener('DOMContentLoaded', () => {
-            // Load key if already saved in localStorage
+            // Load key and endpoint if already saved in localStorage
             const savedKey = localStorage.getItem('custom_groq_api_key');
             if (savedKey) {
                 document.getElementById('local_groq_key').value = savedKey;
+            }
+            const savedUrl = localStorage.getItem('custom_backend_url');
+            if (savedUrl) {
+                document.getElementById('local_backend_url').value = savedUrl;
             }
             
             // Initial view
@@ -587,16 +596,30 @@
         // Settings actions
         function saveSettings() {
             const key = document.getElementById('local_groq_key').value.trim();
+            const url = document.getElementById('local_backend_url').value.trim();
+            
             if (key) {
                 localStorage.setItem('custom_groq_api_key', key);
-                alert('Custom API Key stored successfully!');
+            } else {
+                localStorage.removeItem('custom_groq_api_key');
             }
+
+            if (url) {
+                localStorage.setItem('custom_backend_url', url);
+            } else {
+                localStorage.removeItem('custom_backend_url');
+            }
+            
+            alert('Configurations saved successfully!');
         }
 
+        // Clear settings
         function clearSettings() {
             localStorage.removeItem('custom_groq_api_key');
+            localStorage.removeItem('custom_backend_url');
             document.getElementById('local_groq_key').value = '';
-            alert('Custom API Key cleared! Using system defaults.');
+            document.getElementById('local_backend_url').value = '';
+            alert('Configurations cleared! Using system defaults.');
         }
 
         // Toggle state-specific fields
@@ -754,10 +777,13 @@
                 headers['Authorization'] = `Bearer ${customKey}`; 
             }
 
-            // Detect if running locally or deployed on CDN/Firebase
-            const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                ? ''
-                : 'https://career-bonsai-ai.onrender.com';
+            // Detect if running locally or deployed on CDN/Firebase, check for custom saved URL
+            let baseUrl = localStorage.getItem('custom_backend_url');
+            if (!baseUrl) {
+                baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? ''
+                    : 'https://career-bonsai-ai.onrender.com';
+            }
 
             try {
                 const response = await fetch(`${baseUrl}/api/v1/navigate`, {
