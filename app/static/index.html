@@ -754,8 +754,13 @@
                 headers['Authorization'] = `Bearer ${customKey}`; 
             }
 
+            // Detect if running locally or deployed on CDN/Firebase
+            const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? ''
+                : 'https://career-bonsai-ai.onrender.com';
+
             try {
-                const response = await fetch('/api/v1/navigate', {
+                const response = await fetch(`${baseUrl}/api/v1/navigate`, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify(payload)
