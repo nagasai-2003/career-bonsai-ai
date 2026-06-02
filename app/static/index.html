@@ -804,7 +804,8 @@
                 renderApp(current_state);
             } catch (err) {
                 stopLoader();
-                alert(`Error: ${err.message}. Make sure your Groq API key is valid and your FastAPI server is online.`);
+                console.error("AI GPS Navigation Error:", err);
+                alert(`Error Details: ${err.message}\n\n🔍 Quick Troubleshooting:\n1. Outdated Settings? Go to the "Settings" tab in the sidebar, click "Use Defaults" to clear any custom URLs, and click "Save Configurations".\n2. Server offline? Make sure "uvicorn app.main:app --reload" is still active in your terminal.\n3. API Key issue? Double check that your GROQ_API_KEY in .env (or in the Settings tab) is valid.`);
                 switchView('setup');
             }
         }
