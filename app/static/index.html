@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Career BonSai.ai - AI Career GPS Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#545c70",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary-fixed-dim": "#bfc6dd",
+                        "on-surface-variant": "#464554",
+                        "on-secondary-container": "#fffbff",
+                        "secondary-fixed": "#f0dbff",
+                        "on-tertiary-container": "#fefcff",
+                        "inverse-primary": "#c0c1ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "surface-dim": "#cbdbf5",
+                        "outline-variant": "#c7c4d7",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-tint": "#494bd6",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#2c0051",
+                        "on-background": "#0b1c30",
+                        "primary-container": "#6063ee",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#3f4759",
+                        "secondary-container": "#9c48ea",
+                        "surface-bright": "#f8f9ff",
+                        "outline": "#767586",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed": "#07006c",
+                        "on-tertiary-fixed": "#141b2c",
+                        "inverse-surface": "#213145",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#4648d4",
+                        "tertiary-container": "#6d7489",
+                        "on-primary-container": "#fffbff",
+                        "tertiary-fixed": "#dbe2fa",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "secondary": "#8127cf",
+                        "surface-container": "#e5eeff",
+                        "primary-fixed": "#e1e0ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-variant": "#d3e4fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "lg": "40px",
+                        "sm": "12px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "sans": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .soft-shadow {
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.04);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4648d4, #8127cf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .chart-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease-out forwards;
+        }
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        .dial-circle {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+        /* Custom scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(118, 117, 134, 0.2);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(118, 117, 134, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased overflow-x-hidden flex min-h-screen">
+
+    <!-- Mobile Header/Nav Toggle -->
+    <header class="md:hidden w-full bg-surface border-b border-outline-variant flex items-center justify-between px-md py-sm fixed top-0 left-0 right-0 z-50">
+        <div class="flex items-center gap-sm">
+            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+            <span class="font-extrabold text-on-surface">Career BonSai.ai</span>
+        </div>
+        <button onclick="toggleMobileMenu()" class="p-2 text-outline hover:text-on-surface rounded-lg">
+            <span class="material-symbols-outlined" id="menu-icon">menu</span>
+        </button>
+    </header>
+
+    <!-- SideNavBar (Shared Component) -->
+    <nav id="sidebar" class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-md p-md gap-base z-40 transition-transform duration-300 md:translate-x-0 -translate-x-full">
+        <!-- Logo Header -->
+        <div class="flex items-center gap-sm mb-lg mt-12 md:mt-0">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-sm">
+                <span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg text-primary tracking-tight"><span class="text-on-surface">Career </span>BonSai.ai</h1>
+                <p class="text-[10px] font-bold text-outline uppercase tracking-widest">Enterprise Learning</p>
+            </div>
+        </div>
+        
+        <!-- CTA: New Route / Assessment -->
+        <button onclick="switchView('setup')" class="w-full bg-primary hover:bg-primary-container hover:text-on-primary-container text-on-primary font-bold py-sm px-md rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-xs mb-md">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            New Route
+        </button>
+
+        <!-- Navigation Links -->
+        <div class="flex-1 flex flex-col gap-xs">
+            <button id="nav-dashboard" onclick="switchView('dashboard')" class="nav-btn flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 font-semibold text-sm transition-all duration-200 w-full text-left">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </button>
+            <button id="nav-roadmap" onclick="switchView('roadmap')" class="nav-btn flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 font-semibold text-sm transition-all duration-200 w-full text-left">
+                <span class="material-symbols-outlined">map</span>
+                Roadmap Routing
+            </button>
+            <button id="nav-resources" onclick="switchView('resources')" class="nav-btn flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 font-semibold text-sm transition-all duration-200 w-full text-left">
+                <span class="material-symbols-outlined">library_books</span>
+                Study Center
+            </button>
+            <button id="nav-settings" onclick="switchView('settings')" class="nav-btn flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 font-semibold text-sm transition-all duration-200 w-full text-left">
+                <span class="material-symbols-outlined">settings</span>
+                Settings
+            </button>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="mt-auto border-t border-outline-variant pt-md flex flex-col gap-xs">
+            <div class="px-sm py-xs text-[10px] text-tertiary">
+                System: Active & Live
+            </div>
+            <button onclick="resetData()" class="flex items-center gap-sm px-sm py-sm rounded-lg text-error hover:bg-error-container/20 font-semibold text-sm transition-all duration-200 w-full text-left">
+                <span class="material-symbols-outlined">restart_alt</span>
+                Reset Engine
+            </button>
+        </div>
+    </nav>
+
+    <!-- Background overlay for mobile sidebar -->
+    <div id="sidebar-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/40 z-30 md:hidden"></div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow md:ml-64 p-md lg:p-xl min-h-screen mt-16 md:mt-0 flex flex-col justify-start relative">
+        
+        <!-- ================= SECTION 1: SETUP FORM ================= -->
+        <section id="view-setup" class="view-panel w-full max-w-3xl mx-auto my-auto space-y-lg transition-opacity duration-300">
+            <div class="text-center space-y-xs">
+                <span class="material-symbols-outlined text-5xl text-primary animate-pulse">explore</span>
+                <h2 class="text-display-lg font-extrabold tracking-tight">AI Career GPS Router</h2>
+                <p class="text-body-lg text-tertiary">Build your step-by-step roadmap to bridge skills gaps and land your target role.</p>
+            </div>
+
+            <div class="glass-panel rounded-xl soft-shadow p-md md:p-lg border border-surface-container/60 space-y-md">
+                <h3 class="font-bold text-headline-md text-on-surface flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-primary">route</span>
+                    Configure Career Destination
+                </h3>
+
+                <form id="gps-form" class="space-y-sm" onsubmit="generateCareerGPS(event)">
+                    <!-- Profile State & Age -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div>
+                            <label class="block text-label-md text-on-surface mb-xs font-semibold" for="current_state">Current State</label>
+                            <select id="current_state" name="current_state" onchange="toggleStateFields()" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" required>
+                                <option value="Student">Student</option>
+                                <option value="Employee">Working Professional</option>
+                                <option value="Unemployed">In-Transition / Unemployed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-label-md text-on-surface mb-xs font-semibold" for="age">Age</label>
+                            <input type="number" id="age" name="age" min="15" max="100" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="21" required>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Student Fields -->
+                    <div id="student-fields" class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div>
+                            <label class="block text-label-md text-on-surface mb-xs font-semibold" for="course">Course / Degree</label>
+                            <input type="text" id="course" name="course" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="B.S. Computer Science">
+                        </div>
+                        <div>
+                            <label class="block text-label-md text-on-surface mb-xs font-semibold" for="year_semester">Year & Semester</label>
+                            <input type="text" id="year_semester" name="year_semester" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="3rd Year, 2nd Sem">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Employee Fields -->
+                    <div id="employee-fields" class="hidden">
+                        <label class="block text-label-md text-on-surface mb-xs font-semibold" for="current_role">Current Role</label>
+                        <input type="text" id="current_role" name="current_role" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="Junior QA Engineer">
+                    </div>
+
+                    <!-- Dynamic Unemployed Fields -->
+                    <div id="unemployed-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-sm">
+                        <div>
+                            <label class="block text-label-md text-on-surface mb-xs font-semibold" for="career_gap_months">Career Gap (Months)</label>
+                            <input type="number" id="career_gap_months" name="career_gap_months" min="0" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="6">
+                        </div>
+                        <div>
+                            <label class="block text-label-md text-on-surface mb-xs font-semibold" for="gap_activities">Gap Activities</label>
+                            <input type="text" id="gap_activities" name="gap_activities" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="Self-studying, Bootcamps">
+                        </div>
+                    </div>
+
+                    <!-- Target Role -->
+                    <div>
+                        <label class="block text-label-md text-on-surface mb-xs font-semibold" for="target_role">Target Role / Career Goal</label>
+                        <input type="text" id="target_role" name="target_role" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="AI Engineer / Data Scientist" required>
+                    </div>
+
+                    <!-- Interests -->
+                    <div>
+                        <label class="block text-label-md text-on-surface mb-xs font-semibold" for="interests">Interests (Comma separated)</label>
+                        <input type="text" id="interests" name="interests" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="Machine Learning, Computer Vision, Backend Dev" required>
+                    </div>
+
+                    <!-- Skills Entry Module -->
+                    <div class="bg-surface-container-low/40 rounded-xl p-sm border border-outline-variant/30">
+                        <label class="block text-label-md text-on-surface mb-xs font-semibold">Your Current Skills</label>
+                        <div class="flex gap-xs mb-sm">
+                            <input type="text" id="skill-name-input" class="flex-grow bg-white border border-outline-variant/40 rounded-lg px-sm py-1.5 font-body-md text-body-md text-on-surface placeholder:text-outline outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. Python">
+                            <select id="skill-rating-input" class="w-24 bg-white border border-outline-variant/40 rounded-lg px-sm py-1.5 font-body-md text-body-md text-on-surface outline-none">
+                                <option value="5">★★★★★</option>
+                                <option value="4">★★★★☆</option>
+                                <option value="3">★★★☆☆</option>
+                                <option value="2">★★☆☆☆</option>
+                                <option value="1">★☆☆☆☆</option>
+                            </select>
+                            <button type="button" onclick="addSkill()" class="bg-primary hover:bg-secondary text-white font-bold px-md rounded-lg flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                        </div>
+                        <div id="skills-list" class="flex flex-wrap gap-xs min-h-[40px] max-h-[140px] overflow-y-auto custom-scrollbar p-xs bg-white/50 rounded-lg border border-dashed border-outline-variant/50">
+                            <p id="no-skills-msg" class="text-label-sm text-tertiary m-auto">No skills added yet.</p>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-sm">
+                        <button type="submit" class="w-full bg-gradient-to-r from-primary to-secondary text-on-primary font-bold py-sm px-md rounded-lg shadow-sm hover:opacity-95 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-xs">
+                            <span class="material-symbols-outlined text-[20px]">explore</span>
+                            Generate AI GPS Route
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: LOADER ================= -->
+        <section id="view-loader" class="view-panel hidden w-full max-w-md mx-auto my-auto glass-panel rounded-xl soft-shadow p-lg border border-outline-variant/30 text-center space-y-md transform transition-all duration-300">
+            <div class="relative flex items-center justify-center h-28">
+                <div class="absolute w-24 h-24 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <span class="material-symbols-outlined text-primary text-5xl font-extrabold animate-pulse">auto_awesome</span>
+            </div>
+            <div>
+                <h3 id="loader-title" class="text-headline-md font-extrabold text-on-surface">Configuring Router...</h3>
+                <p id="loader-subtitle" class="text-body-md text-tertiary mt-xs">Setting coordinates</p>
+            </div>
+            <div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+                <div id="loader-bar" class="bg-gradient-to-r from-primary to-secondary h-1.5 w-1/4 rounded-full transition-all duration-500"></div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: DASHBOARD ================= -->
+        <section id="view-dashboard" class="view-panel hidden w-full space-y-lg transition-opacity duration-300">
+            <!-- Header bar -->
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-sm mb-lg">
+                <div>
+                    <h2 class="font-extrabold text-3xl md:text-display-lg text-on-surface mb-xs flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary text-4xl">dashboard</span>
+                        AI Career Dashboard
+                    </h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant flex items-center gap-xs">
+                        Route to: <span class="font-bold text-primary" id="dash-dest-role">Senior AI Engineer</span>
+                        <span class="text-xs px-2 py-0.5 bg-surface-container-high rounded-full font-semibold uppercase text-tertiary" id="dash-dest-state">Student</span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-sm">
+                    <span class="px-sm py-xs bg-surface-container-low text-primary font-bold text-label-sm rounded-full border border-primary-fixed" id="dash-dest-weeks">Target: 12 Weeks</span>
+                </div>
+            </header>
+
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+                <!-- Progress Tracker (Spans 8 columns) -->
+                <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container flex flex-col justify-between h-[360px]">
+                    <div class="flex justify-between items-start mb-md">
+                        <div>
+                            <h3 class="font-extrabold text-headline-md text-on-surface">Job Readiness Score</h3>
+                            <p class="text-label-md text-on-surface-variant mt-xs">Alignment of skills and interests to target career parameters.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row items-center gap-xl h-full pb-sm">
+                        <!-- Dial Circle -->
+                        <div class="relative w-36 h-36 shrink-0">
+                            <svg class="w-full h-full" viewBox="0 0 100 100">
+                                <circle class="text-surface-container" cx="50" cy="50" fill="transparent" r="45" stroke="currentColor" stroke-width="8"></circle>
+                                <circle id="dash-dial" class="text-primary dial-circle" cx="50" cy="50" fill="transparent" r="45" stroke="currentColor" stroke-linecap="round" stroke-width="8"></circle>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="font-bold text-3xl text-on-surface" id="dash-readiness-percent">0%</span>
+                                <span class="font-bold text-[10px] text-primary uppercase tracking-widest" id="dash-readiness-badge">Pruning</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Mini Historical Projection Chart -->
+                        <div class="flex-1 h-32 w-full relative">
+                            <div class="absolute top-0 right-0 flex gap-xs z-10">
+                                <span class="px-2 py-0.5 bg-primary text-on-primary font-bold text-[10px] rounded shadow-sm">GPS Forecast</span>
+                            </div>
+                            <svg class="w-full h-full pt-6" preserveAspectRatio="none" viewBox="0 0 400 100">
+                                <defs>
+                                    <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#4648d4" stop-opacity="0.25"></stop>
+                                        <stop offset="100%" stop-color="#4648d4" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <line stroke="#f1f5f9" stroke-width="1" x1="0" x2="400" y1="20" y2="20"></line>
+                                <line stroke="#f1f5f9" stroke-width="1" x1="0" x2="400" y1="50" y2="50"></line>
+                                <line stroke="#f1f5f9" stroke-width="1" x1="0" x2="400" y1="80" y2="80"></line>
+                                <path d="M0,80 L0,70 C50,60 100,55 150,45 C200,35 250,25 300,15 C350,8 400,2 400,2 L400,80 Z" fill="url(#chartGradient)"></path>
+                                <path class="chart-line" d="M0,70 C50,60 100,55 150,45 C200,35 250,25 300,15 C350,8 400,2" fill="none" stroke="#4648d4" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                                <circle cx="150" cy="45" fill="#ffffff" r="4" stroke="#4648d4" stroke-width="2"></circle>
+                                <circle cx="300" cy="15" fill="#ffffff" r="4" stroke="#4648d4" stroke-width="2"></circle>
+                                <circle cx="400" cy="2" fill="#ffffff" r="4" stroke="#4648d4" stroke-width="2"></circle>
+                            </svg>
+                            <div class="absolute bottom-0 w-full flex justify-between text-[10px] text-on-surface-variant font-bold opacity-60">
+                                <span>Week 1</span>
+                                <span>Week 4</span>
+                                <span>Week 8</span>
+                                <span>Target Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resource Panel / Missing Skills Preview (Spans 4 columns) -->
+                <div class="lg:col-span-4 bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container flex flex-col h-[360px]">
+                    <div class="flex justify-between items-center mb-md">
+                        <h3 class="font-extrabold text-headline-md text-on-surface">Skill Gaps</h3>
+                        <button onclick="switchView('resources')" class="font-bold text-sm text-primary hover:underline">Study All</button>
+                    </div>
+                    <!-- Mini Cards for Gaps -->
+                    <div id="dash-missing-container" class="flex-grow overflow-y-auto custom-scrollbar space-y-sm pr-xs">
+                        <!-- Dynamic Skills Cards go here -->
+                    </div>
+                </div>
+
+                <!-- Capstone Project Bento Card (Spans 12 columns) -->
+                <div class="lg:col-span-12 bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container bg-gradient-to-br from-white to-surface-container-low/40">
+                    <div class="flex items-start justify-between gap-sm mb-sm border-b border-surface-container pb-xs">
+                        <div>
+                            <h3 class="font-extrabold text-headline-md text-on-surface flex items-center gap-xs">
+                                <span class="material-symbols-outlined text-secondary text-2xl font-bold">workspace_premium</span>
+                                Bridging Capstone Project
+                            </h3>
+                            <p class="text-label-sm text-tertiary">An end-to-end hands-on project designed to prove all newly acquired skills to recruiters.</p>
+                        </div>
+                        <button onclick="copyProject()" class="text-outline hover:text-primary transition-colors flex items-center justify-center p-2 rounded-lg bg-surface/50 border border-outline-variant/20 hover:border-primary/50" title="Copy specs">
+                            <span class="material-symbols-outlined text-lg">content_copy</span>
+                        </button>
+                    </div>
+                    <div class="bg-white/80 border border-outline-variant/10 rounded-xl p-md shadow-sm">
+                        <h4 class="font-bold text-on-surface text-body-md mb-xs">Capstone Specifications</h4>
+                        <p id="dash-project-desc" class="text-label-md text-tertiary leading-relaxed">
+                            Generating project specs...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: ROADMAP ================= -->
+        <section id="view-roadmap" class="view-panel hidden w-full space-y-lg transition-opacity duration-300">
+            <header class="mb-lg">
+                <h2 class="font-extrabold text-3xl md:text-display-lg text-on-surface mb-xs flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-secondary text-4xl">map</span>
+                    Timeline Routing
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Step-by-step week execution actions to match target career parameters.</p>
+            </header>
+
+            <div class="bg-surface-container-lowest rounded-xl p-md md:p-lg soft-shadow border border-surface-container">
+                <div class="flex justify-between items-center mb-xl border-b border-surface-container pb-sm">
+                    <div>
+                        <h3 class="font-extrabold text-headline-md text-on-surface">Learning Roadmap Timeline</h3>
+                        <p class="text-label-md text-on-surface-variant mt-xs">Check off finished weekly tasks to raise your Job Readiness score!</p>
+                    </div>
+                    <div class="flex gap-sm">
+                        <span class="flex items-center gap-xs text-[11px] font-bold text-on-surface-variant"><span class="w-3 h-3 rounded-full bg-primary"></span> Completed</span>
+                        <span class="flex items-center gap-xs text-[11px] font-bold text-on-surface-variant"><span class="w-3 h-3 rounded-full border-2 border-primary"></span> In Progress</span>
+                        <span class="flex items-center gap-xs text-[11px] font-bold text-on-surface-variant"><span class="w-3 h-3 rounded-full bg-surface-variant"></span> Locked</span>
+                    </div>
+                </div>
+
+                <div class="relative pl-lg">
+                    <!-- Vertical Connector Line -->
+                    <div class="absolute left-[39px] top-4 bottom-4 w-0.5 bg-surface-variant z-0"></div>
+                    <div id="roadmap-timeline-container" class="flex flex-col gap-lg relative">
+                        <!-- Dynamic timeline nodes go here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 5: STUDY RESOURCES ================= -->
+        <section id="view-resources" class="view-panel hidden w-full space-y-lg transition-opacity duration-300">
+            <header class="mb-lg">
+                <h2 class="font-extrabold text-3xl md:text-display-lg text-on-surface mb-xs flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-primary text-4xl">library_books</span>
+                    AI Study Center
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Curated high-quality, targeted courses and references to bridge your skill deficits.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md" id="resources-grid-container">
+                <!-- Dynamic cards go here -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 6: SETTINGS ================= -->
+        <section id="view-settings" class="view-panel hidden w-full max-w-2xl mx-auto space-y-lg transition-opacity duration-300">
+            <header class="mb-lg text-center">
+                <h2 class="font-extrabold text-3xl text-on-surface mb-xs flex items-center justify-center gap-xs">
+                    <span class="material-symbols-outlined text-primary text-3xl">settings</span>
+                    GPS Configurations
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Customize your LLM provider parameter values.</p>
+            </header>
+
+            <div class="glass-panel rounded-xl soft-shadow p-md border border-surface-container/60 space-y-md">
+                <div>
+                    <h3 class="font-bold text-headline-md text-on-surface">API Credentials</h3>
+                    <p class="text-label-md text-on-surface-variant">Enter a customized API Key to overwrite environment settings.</p>
+                </div>
+                <div class="space-y-sm">
+                    <div>
+                        <label class="block text-label-md text-on-surface mb-xs font-semibold" for="local_groq_key">Custom Groq API Key</label>
+                        <input type="password" id="local_groq_key" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-md py-2 font-body-md text-body-md text-on-surface outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" placeholder="gsk_...">
+                    </div>
+                    <div class="flex gap-sm">
+                        <button onclick="saveSettings()" class="bg-primary hover:bg-secondary text-white font-bold py-2 px-md rounded-lg transition-colors">
+                            Save Key
+                        </button>
+                        <button onclick="clearSettings()" class="border border-outline text-on-surface hover:bg-surface-container-low font-bold py-2 px-md rounded-lg transition-colors">
+                            Use System Key
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Routing Logic -->
+    <script>
+        // Skills tracking arrays
+        let skills = [];
+        let activeView = 'setup';
+        let generatedData = null;
+
+        // On document load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load key if already saved in localStorage
+            const savedKey = localStorage.getItem('custom_groq_api_key');
+            if (savedKey) {
+                document.getElementById('local_groq_key').value = savedKey;
+            }
+            
+            // Initial view
+            switchView('setup');
+        });
+
+        // Mobile Sidebar toggler
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full', 'hidden');
+                sidebar.classList.add('translate-x-0', 'flex');
+                overlay.classList.remove('hidden');
+                menuIcon.textContent = 'close';
+            } else {
+                sidebar.classList.remove('translate-x-0', 'flex');
+                sidebar.classList.add('-translate-x-full', 'hidden');
+                overlay.classList.add('hidden');
+                menuIcon.textContent = 'menu';
+            }
+        }
+
+        // View Swapper
+        function switchView(viewName) {
+            // Hide overlay if mobile menu is open
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!overlay.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+
+            // If attempting to go to dashboards without setup
+            if ((viewName === 'dashboard' || viewName === 'roadmap' || viewName === 'resources') && !generatedData) {
+                alert('Configure your career destination first to unlock dashboard routes!');
+                switchView('setup');
+                return;
+            }
+
+            activeView = viewName;
+
+            // Toggle panels
+            document.querySelectorAll('.view-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            // Style Sidebar elements
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 font-semibold text-sm transition-all duration-200 w-full text-left';
+            });
+            
+            const activeBtn = document.getElementById(`nav-${viewName}`);
+            if (activeBtn) {
+                activeBtn.className = 'nav-btn flex items-center gap-sm px-sm py-sm rounded-lg bg-primary-container text-on-primary-container font-semibold text-sm transition-transform duration-200 scale-95 active:scale-100 w-full text-left';
+            }
+        }
+
+        // Settings actions
+        function saveSettings() {
+            const key = document.getElementById('local_groq_key').value.trim();
+            if (key) {
+                localStorage.setItem('custom_groq_api_key', key);
+                alert('Custom API Key stored successfully!');
+            }
+        }
+
+        function clearSettings() {
+            localStorage.removeItem('custom_groq_api_key');
+            document.getElementById('local_groq_key').value = '';
+            alert('Custom API Key cleared! Using system defaults.');
+        }
+
+        // Toggle state-specific fields
+        function toggleStateFields() {
+            const state = document.getElementById('current_state').value;
+            const studentFields = document.getElementById('student-fields');
+            const employeeFields = document.getElementById('employee-fields');
+            const unemployedFields = document.getElementById('unemployed-fields');
+
+            studentFields.classList.add('hidden');
+            employeeFields.classList.add('hidden');
+            unemployedFields.classList.add('hidden');
+
+            if (state === 'Student') {
+                studentFields.classList.remove('hidden');
+            } else if (state === 'Employee') {
+                employeeFields.classList.remove('hidden');
+            } else if (state === 'Unemployed') {
+                unemployedFields.classList.remove('hidden');
+            }
+        }
+
+        // Add Skill to tag list
+        function addSkill() {
+            const nameInput = document.getElementById('skill-name-input');
+            const ratingInput = document.getElementById('skill-rating-input');
+            
+            const name = nameInput.value.trim();
+            const rating = parseInt(ratingInput.value);
+
+            if (!name) return;
+
+            if (skills.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+                alert('Skill already added!');
+                return;
+            }
+
+            skills.push({ name, rating });
+            renderSkills();
+
+            nameInput.value = '';
+            ratingInput.selectedIndex = 0;
+            nameInput.focus();
+        }
+
+        function removeSkill(idx) {
+            skills.splice(idx, 1);
+            renderSkills();
+        }
+
+        function renderSkills() {
+            const list = document.getElementById('skills-list');
+            const noSkillsMsg = document.getElementById('no-skills-msg');
+            list.innerHTML = '';
+
+            if (skills.length === 0) {
+                list.appendChild(noSkillsMsg);
+                return;
+            }
+
+            skills.forEach((skill, idx) => {
+                const tag = document.createElement('div');
+                tag.className = 'flex items-center gap-xs bg-primary/10 border border-primary/20 text-primary font-semibold text-xs pl-sm pr-xs py-1 rounded-full shadow-sm';
+                let stars = '★'.repeat(skill.rating) + '☆'.repeat(5 - skill.rating);
+                tag.innerHTML = `
+                    <span><strong>${escapeHTML(skill.name)}</strong> (${stars})</span>
+                    <button type="button" onclick="removeSkill(${idx})" class="text-primary hover:text-secondary rounded-full flex items-center justify-center p-0.5">
+                        <span class="material-symbols-outlined text-sm font-bold">close</span>
+                    </button>
+                `;
+                list.appendChild(tag);
+            });
+        }
+
+        // Loaders
+        let loaderInterval;
+        function startLoader() {
+            switchView('loader');
+            const loaderTitle = document.getElementById('loader-title');
+            const loaderSubtitle = document.getElementById('loader-subtitle');
+            const loaderBar = document.getElementById('loader-bar');
+
+            const loadingPhrases = [
+                { title: 'Pruning Academic Gaps...', subtitle: 'Calculating student state context structures', percent: '25%' },
+                { title: 'Growing Skills Bonsai...', subtitle: 'Analyzing target market standard requirements', percent: '50%' },
+                { title: 'Constructing Custom Roadmap...', subtitle: 'Mapping weekly execution action plan steps', percent: '75%' },
+                { title: 'Tailoring Bridge Projects...', subtitle: 'Forging custom capstone project blueprints', percent: '95%' }
+            ];
+
+            let step = 0;
+            loaderTitle.textContent = loadingPhrases[0].title;
+            loaderSubtitle.textContent = loadingPhrases[0].subtitle;
+            loaderBar.style.width = loadingPhrases[0].percent;
+
+            loaderInterval = setInterval(() => {
+                step++;
+                if (step >= loadingPhrases.length) {
+                    clearInterval(loaderInterval);
+                    return;
+                }
+                loaderTitle.textContent = loadingPhrases[step].title;
+                loaderSubtitle.textContent = loadingPhrases[step].subtitle;
+                loaderBar.style.width = loadingPhrases[step].percent;
+            }, 2000);
+        }
+
+        function stopLoader() {
+            clearInterval(loaderInterval);
+            document.getElementById('view-loader').classList.add('hidden');
+        }
+
+        // Call API
+        async function generateCareerGPS(event) {
+            event.preventDefault();
+
+            if (skills.length === 0) {
+                alert('Please add at least one of your current skills first!');
+                return;
+            }
+
+            const current_state = document.getElementById('current_state').value;
+            const age = parseInt(document.getElementById('age').value);
+            const target_role = document.getElementById('target_role').value.trim();
+            const interestsStr = document.getElementById('interests').value;
+            const interests = interestsStr.split(',').map(i => i.trim()).filter(Boolean);
+
+            const payload = {
+                current_state,
+                age,
+                skills,
+                interests,
+                target_role
+            };
+
+            if (current_state === 'Student') {
+                payload.course = document.getElementById('course').value.trim() || null;
+                payload.year_semester = document.getElementById('year_semester').value.trim() || null;
+            } else if (current_state === 'Employee') {
+                payload.current_role = document.getElementById('current_role').value.trim() || null;
+            } else if (current_state === 'Unemployed') {
+                const gapVal = document.getElementById('career_gap_months').value;
+                payload.career_gap_months = gapVal ? parseInt(gapVal) : null;
+                payload.gap_activities = document.getElementById('gap_activities').value.trim() || null;
+            }
+
+            startLoader();
+
+            // Inject custom key in headers if specified
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            const customKey = localStorage.getItem('custom_groq_api_key');
+            if (customKey) {
+                headers['Authorization'] = `Bearer ${customKey}`; 
+            }
+
+            try {
+                const response = await fetch('/api/v1/navigate', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                stopLoader();
+                
+                // Save and render
+                generatedData = result.data;
+                renderApp(current_state);
+            } catch (err) {
+                stopLoader();
+                alert(`Error: ${err.message}. Make sure your Groq API key is valid and your FastAPI server is online.`);
+                switchView('setup');
+            }
+        }
+
+        // Render Data across views
+        function renderApp(state) {
+            const data = generatedData;
+            const skillsAnalysis = data.skill_gap_analysis;
+            const roadmap = data.roadmap;
+
+            // RENDER DASHBOARD HEADER DATA
+            document.getElementById('dash-dest-role').textContent = data.profile_summary;
+            document.getElementById('dash-dest-state').textContent = state;
+            document.getElementById('dash-dest-weeks').textContent = `Target: ${roadmap.estimated_weeks_to_target} Weeks`;
+
+            // DIAL RENDER & MATH
+            const percentVal = skillsAnalysis.current_match_percentage;
+            document.getElementById('dash-readiness-percent').textContent = `${percentVal}%`;
+            
+            const badgeEl = document.getElementById('dash-readiness-badge');
+            if (percentVal < 40) {
+                badgeEl.textContent = 'Needs Work';
+                badgeEl.className = 'font-bold text-[10px] text-error uppercase tracking-widest';
+            } else if (percentVal < 75) {
+                badgeEl.textContent = 'Growing';
+                badgeEl.className = 'font-bold text-[10px] text-secondary uppercase tracking-widest';
+            } else {
+                badgeEl.textContent = 'Ready';
+                badgeEl.className = 'font-bold text-[10px] text-primary uppercase tracking-widest';
+            }
+
+            // Adjust stroke circumference
+            const dialCirc = 283;
+            const strokeOffset = dialCirc - (percentVal / 100) * dialCirc;
+            document.getElementById('dash-dial').style.strokeDashoffset = strokeOffset;
+
+            // RENDER DASHBOARD GAPS LIST
+            const dashGapsList = document.getElementById('dash-missing-container');
+            dashGapsList.innerHTML = '';
+            
+            if (!skillsAnalysis.missing_skills || skillsAnalysis.missing_skills.length === 0) {
+                dashGapsList.innerHTML = `<p class="text-label-sm text-tertiary m-auto text-center">No missing skills detected!</p>`;
+            } else {
+                skillsAnalysis.missing_skills.forEach(skill => {
+                    const card = document.createElement('div');
+                    card.className = 'flex items-center justify-between bg-white border border-outline-variant/10 rounded-lg p-sm shadow-sm';
+                    
+                    let impColor = 'bg-surface-container text-tertiary';
+                    if (skill.importance.toLowerCase() === 'high') {
+                        impColor = 'bg-error-container text-on-error-container font-bold';
+                    } else if (skill.importance.toLowerCase() === 'medium') {
+                        impColor = 'bg-secondary-fixed text-on-secondary-fixed font-bold';
+                    }
+
+                    card.innerHTML = `
+                        <div>
+                            <h4 class="font-bold text-on-surface text-label-md">${escapeHTML(skill.skill_name)}</h4>
+                            <p class="text-[10px] text-outline truncate max-w-[150px]">${escapeHTML(skill.learning_resource)}</p>
+                        </div>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full uppercase ${impColor}">${escapeHTML(skill.importance)}</span>
+                    `;
+                    dashGapsList.appendChild(card);
+                });
+            }
+
+            // RENDER CAPSTONE SPECIFICATIONS
+            document.getElementById('dash-project-desc').textContent = roadmap.bridge_project;
+
+            // RENDER ROADMAP TIMELINE VIEW
+            const timelineContainer = document.getElementById('roadmap-timeline-container');
+            timelineContainer.innerHTML = '';
+
+            roadmap.weekly_plan.forEach((plan, idx) => {
+                const node = document.createElement('div');
+                node.className = 'relative z-10 flex gap-md group';
+                
+                // Let's decide node state:
+                // Week 1 is In Progress by default. Future weeks are Locked. Past weeks could be Completed when checked off.
+                // We'll set Week 1 to In Progress (Active) and others to Locked initially.
+                let isActive = (idx === 0);
+                let isLocked = (idx > 0);
+
+                let statusBadge = isLocked 
+                    ? `<span class="px-2 py-1 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Locked</span>`
+                    : `<span class="px-2 py-0.5 bg-primary-container text-on-primary-container font-semibold rounded-full text-[10px]">Active</span>`;
+                
+                let iconHTML = isLocked
+                    ? `<span class="material-symbols-outlined text-[16px]">lock</span>`
+                    : `<span class="material-symbols-outlined text-[16px] animate-pulse">more_horiz</span>`;
+
+                let bgClass = isLocked 
+                    ? 'bg-surface border-outline-variant border-dashed border-2 opacity-75' 
+                    : 'bg-surface-bright border-primary soft-shadow border-2';
+
+                let tasksHTML = '';
+                if (plan.tasks) {
+                    plan.tasks.forEach((t, tIdx) => {
+                        tasksHTML += `
+                            <label class="flex items-start gap-xs text-label-md text-tertiary select-none cursor-pointer hover:text-on-surface transition-colors py-0.5">
+                                <input type="checkbox" ${isLocked ? 'disabled' : ''} onchange="updateTaskProgress(${idx})" class="mt-1 rounded text-primary focus:ring-primary border-outline-variant/40">
+                                <span>${escapeHTML(t)}</span>
+                            </label>
+                        `;
+                    });
+                }
+
+                node.innerHTML = `
+                    <div class="w-8 h-8 rounded-full ${isActive ? 'bg-surface-container-lowest border-2 border-primary text-primary' : 'bg-surface-variant text-outline'} flex items-center justify-center shrink-0 shadow-sm ring-4 ring-surface-container-lowest mt-1 z-10" id="node-icon-${idx}">
+                        ${iconHTML}
+                    </div>
+                    <div class="flex-1 rounded-lg p-md transition-colors ${bgClass}" id="node-card-${idx}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-on-surface text-body-md mb-xs" id="node-title-${idx}">Week ${plan.week_number}: ${escapeHTML(plan.focus)}</h4>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="flex flex-col gap-xs mt-sm pt-xs border-t border-outline-variant/10">
+                            ${tasksHTML}
+                        </div>
+                    </div>
+                `;
+                timelineContainer.appendChild(node);
+            });
+
+            // RENDER AI STUDY CENTER RESOURCES VIEW
+            const resourcesGrid = document.getElementById('resources-grid-container');
+            resourcesGrid.innerHTML = '';
+
+            const resourceImages = [
+                "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=400&q=80",
+                "https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&w=400&q=80",
+                "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=400&q=80"
+            ];
+
+            skillsAnalysis.missing_skills.forEach((skill, idx) => {
+                const img = resourceImages[idx % resourceImages.length];
+                const card = document.createElement('div');
+                card.className = 'group relative rounded-lg overflow-hidden border border-outline-variant cursor-pointer bg-white';
+                card.innerHTML = `
+                    <div class="h-24 bg-surface-variant w-full relative">
+                        <img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300" src="${img}">
+                        <div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 to-transparent"></div>
+                        <div class="absolute bottom-sm left-sm">
+                            <span class="px-2 py-0.5 bg-primary/20 backdrop-blur-md text-on-primary font-label-sm text-label-sm rounded uppercase text-[10px]">Reference</span>
+                        </div>
+                    </div>
+                    <div class="p-sm">
+                        <h4 class="font-bold text-label-md text-on-surface line-clamp-1 group-hover:text-primary transition-colors">${escapeHTML(skill.skill_name)}</h4>
+                        <p class="text-label-sm text-on-surface-variant mt-xs mb-sm line-clamp-1">${escapeHTML(skill.learning_resource)}</p>
+                        <a href="https://www.google.com/search?q=${encodeURIComponent(skill.skill_name + ' ' + skill.learning_resource)}" target="_blank" class="block w-full text-center py-xs border border-primary text-primary hover:bg-surface-container-low rounded-lg font-bold text-sm transition-colors">Start Now</a>
+                    </div>
+                `;
+                resourcesGrid.appendChild(card);
+            });
+
+            // Redirect to Dashboard
+            switchView('dashboard');
+        }
+
+        // Dynamic Interactive Checklist progress logic
+        function updateTaskProgress(weekIdx) {
+            const plan = generatedData.roadmap.weekly_plan[weekIdx];
+            const nodeCard = document.getElementById(`node-card-${weekIdx}`);
+            const nodeIcon = document.getElementById(`node-icon-${weekIdx}`);
+            const checkboxes = nodeCard.querySelectorAll('input[type="checkbox"]');
+            
+            let checkedCount = 0;
+            checkboxes.forEach(c => { if(c.checked) checkedCount++; });
+
+            if (checkedCount === checkboxes.length) {
+                // Completed!
+                nodeCard.className = 'flex-1 bg-surface rounded-lg p-md border border-outline-variant hover:border-primary/30 transition-colors opacity-90';
+                nodeIcon.className = 'w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm ring-4 ring-surface-container-lowest mt-1 z-10';
+                nodeIcon.innerHTML = `<span class="material-symbols-outlined text-[16px]">check</span>`;
+                
+                // Unlock the next week!
+                const nextIdx = weekIdx + 1;
+                if (nextIdx < generatedData.roadmap.weekly_plan.length) {
+                    const nextCard = document.getElementById(`node-card-${nextIdx}`);
+                    const nextIcon = document.getElementById(`node-icon-${nextIdx}`);
+                    if (nextCard && nextIcon) {
+                        nextCard.className = 'flex-1 bg-surface-bright border-primary soft-shadow border-2';
+                        nextCard.querySelectorAll('input[type="checkbox"]').forEach(c => c.removeAttribute('disabled'));
+                        nextIcon.className = 'w-8 h-8 rounded-full bg-surface-container-lowest border-2 border-primary text-primary flex items-center justify-center shrink-0 shadow-sm ring-4 ring-surface-container-lowest mt-1 z-10';
+                        nextIcon.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-pulse">more_horiz</span>`;
+                        // Remove "Locked" status label
+                        const badgeContainer = nextCard.querySelector('.flex.justify-between.items-start');
+                        const statusBadge = badgeContainer.querySelector('span');
+                        if (statusBadge) {
+                            statusBadge.className = 'px-2 py-0.5 bg-primary-container text-on-primary-container font-semibold rounded-full text-[10px]';
+                            statusBadge.textContent = 'Active';
+                        }
+                    }
+                }
+            } else {
+                // In Progress
+                nodeCard.className = 'flex-grow bg-surface-bright rounded-lg p-md border border-primary soft-shadow border-2';
+                nodeIcon.className = 'w-8 h-8 rounded-full bg-surface-container-lowest border-2 border-primary text-primary flex items-center justify-center shrink-0 shadow-sm ring-4 ring-surface-container-lowest mt-1 z-10';
+                nodeIcon.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-pulse">more_horiz</span>`;
+            }
+        }
+
+        // Copy Project specs
+        function copyProject() {
+            const desc = document.getElementById('dash-project-desc').textContent;
+            navigator.clipboard.writeText(desc.trim()).then(() => {
+                alert('Capstone project details copied!');
+            });
+        }
+
+        // Reset system data
+        function resetData() {
+            if (confirm('Are you sure you want to reset all engine roadmaps and configurations?')) {
+                generatedData = null;
+                skills = [];
+                renderSkills();
+                document.getElementById('gps-form').reset();
+                switchView('setup');
+            }
+        }
+
+        // Helper to escape HTML tags
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
